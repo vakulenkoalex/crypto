@@ -12,6 +12,8 @@ class Config:
         self.bybit_testnet = True
         self.telegram_bot_token = ""
         self.log_file = ""
+        self.pause_in_check_order_filled = 5
+        self.counter_in_check_order_filled = 3
 
     def read_config_file(self):
         with open(self._file_name) as conf_file:
