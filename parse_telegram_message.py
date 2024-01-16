@@ -16,7 +16,10 @@ def parse_message(text):
 
     try:
         new_signal = Signal(config, text)
+        logger.info(f"Create {new_signal}")
+
         new_order = Order(config, new_signal)
+        logger.info(f"Create {new_order}")
 
         session = HTTP(
             testnet=config.bybit_testnet,
