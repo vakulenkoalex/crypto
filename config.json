@@ -1,0 +1,10 @@
+{
+	"buy_percent_for_tp_sl": 2,
+	"sell_percent_for_tp_sl": -2,
+	"account_percent_for_quantity": 10,
+	"bybit_api_key": "CpxPbC0K4bViGJjjis",
+	"bybit_api_secret": "HbGaoL1MEXQXELrosySHq45vb1eHNLoVriFQ",
+	"bybit_testnet": "True",
+	"telegram_bot_token": "6856456941:AAFO6C5oUt1-NRywqlHvwptyV899Zx_KzVY",
+	"log_file": "D:\\crypto.txt"
+}
