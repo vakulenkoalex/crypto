@@ -8,7 +8,7 @@ class ByBit:
         self._session = session
         self._order = order
         self._logger = CryptoLogger("ByBit", config.log_file)
-        self._orderId = ""
+        self._orderId = None
         self._quantity = None
 
     def __format__(self, format_spec):
@@ -43,7 +43,7 @@ class ByBit:
 
         reply_order = self._get_result_from_api(reply)
         if reply_order is None:
-            raise CryptoException(self.__class__.__name__, "place_order result.list empty")
+            raise self._exception("place_order result.list empty")
         self._orderId = reply_order.orderId
 
         return True
@@ -51,12 +51,12 @@ class ByBit:
     def check_order_filled(self):
         self._logger.info(f"check_order_filled {self}")
         if self._orderId == "":
-            raise CryptoException(self.__class__.__name__, "_orderId empty")
+            raise self._exception("_orderId empty")
 
         filled_statuses = ["Filled"]
         result = self._order_in_status(filled_statuses, orderId=self._orderId)
         if result is None:
-            raise CryptoException(self.__class__.__name__, "check_order_filled result.list empty")
+            raise self._exception("check_order_filled result.list empty")
 
         self._logger.info(f"check_order_filled_result {result} ({self})")
         return result
@@ -100,9 +100,12 @@ class ByBit:
 
     def _get_result_from_api(self, reply):
         if reply["retCode"] != 0:
-            raise CryptoException(self.__class__.__name__, "get_result_from_api retCode not 0")
+            raise self._exception("get_result_from_api retCode not 0")
         reply_list = reply["result"]["list"]
         if len(reply_list) == 0:
             return None
 
         return reply_list[0]
+
+    def _exception(self, message):
+        return CryptoException(self.__class__.__name__, message)
