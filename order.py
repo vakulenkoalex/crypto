@@ -1,7 +1,6 @@
 import math
 
 from exception import CryptoException
-from logger import CryptoLogger
 from read_signal import Direction
 
 
@@ -17,11 +16,8 @@ class Order:
         self._signal = signal
         self._config = config
         self._percent = 0
-
-        logger = CryptoLogger("Order", self._config.log_file)
         self.get_side_by_direction()
         self.set_tp_sl()
-        logger.info(f"Create {self}")
 
     def __format__(self, format_spec):
         return (f"{self.__class__.__name__}:"
