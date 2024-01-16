@@ -17,6 +17,7 @@ def test_pump():
     assert new_signal.high_sum == '0.10469'
     assert new_signal.low_sum == '0.0995'
 
+
 def test_dump():
     text = '''┌ 📉 DUMP: #XAIUSDT 😱😱😱
     ├ 🔴 CHANGE: -5.26% 😡
