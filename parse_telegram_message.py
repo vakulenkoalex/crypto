@@ -1,4 +1,5 @@
 from pybit.unified_trading import HTTP
+import time
 
 from by_bit import ByBit
 from config import Config
@@ -16,12 +17,18 @@ def parse_message(text):
     try:
         new_signal = Signal(config, text)
         new_order = Order(config, new_signal)
+
         session = HTTP(
             testnet=config.bybit_testnet,
             api_key=config.bybit_api_key,
             api_secret=config.bybit_api_secret,
         )
         new_bybit = ByBit(config, session, new_order)
-        new_bybit.place_order()
+        if not new_bybit.place_order():
+            return
+        for counter in range(config.counter_in_check_order_filled):
+            time.sleep(config.pause_in_check_order_filled)
+            if new_bybit.check_order_filled():
+                break
     except Exception as e:
         logger.error(f"error: {e}")
