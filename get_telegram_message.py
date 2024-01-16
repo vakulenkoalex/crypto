@@ -1,10 +1,9 @@
 from telegram import Update
 from telegram.ext import filters, MessageHandler, ApplicationBuilder, ContextTypes
 
-from config import Config
 import parse_telegram_message
+from config import Config
 from logger import CryptoLogger
-
 
 file_config = 'config.json'
 config = Config(file_config)
@@ -14,7 +13,7 @@ logger = CryptoLogger("telegram_message", config.log_file)
 async def get_text_form_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
     message = update.effective_message
     logger.info(f"Get message '{message.text}'")
-    # parse_telegram_message.parse_message(message.text)
+    parse_telegram_message.parse_message(message.text)
 
 
 logger.info("Start listen")

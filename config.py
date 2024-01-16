@@ -1,5 +1,6 @@
 import json
 
+
 class Config:
     def __init__(self, file_name):
         self._file_name = file_name
