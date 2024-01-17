@@ -1,15 +1,22 @@
 import logging
+import sys
 
 
 class CryptoLogger:
-    def __init__(self, name, log_file):
+    def __init__(self, config, name):
         self.logger = logging.getLogger(name)
-        self.logger.setLevel(logging.DEBUG)
+        if config.debug:
+            self.logger.setLevel(logging.DEBUG)
+        else:
+            self.logger.setLevel(logging.INFO)
+
         if len(self.logger.handlers) == 0:
-            file_handler = logging.FileHandler(log_file, encoding='utf8')
             formatter = logging.Formatter('%(asctime)s - %(levelname)s - %(name)s (%(process)5d) - %(message)s')
-            file_handler.setFormatter(formatter)
+            file_handler = logging.FileHandler(config.log_file, encoding='utf8')
             self.logger.addHandler(file_handler)
+            self.logger.addHandler(logging.StreamHandler(sys.stdout))
+            for element in self.logger.handlers:
+                element.setFormatter(formatter)
 
     def info(self, message):
         self.logger.info(message)
