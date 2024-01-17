@@ -18,6 +18,10 @@ def parse_message(text):
         new_signal = Signal(config, text)
         logger.debug(f"Create {new_signal}")
 
+        if new_signal.symbol in config.black_list_symbol:
+            logger.info(f"symbol in black list ({new_signal})")
+            return
+
         new_order = Order(config, new_signal)
         logger.debug(f"Create {new_order}")
 
