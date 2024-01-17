@@ -1,3 +1,5 @@
+import math
+
 from exception import CryptoException
 from logger import CryptoLogger
 
@@ -7,7 +9,7 @@ class ByBit:
         self._config = config
         self._session = session
         self._order = order
-        self._logger = CryptoLogger("ByBit", config.log_file)
+        self._logger = CryptoLogger(config, "ByBit")
         self._orderId = None
         self._quantity = None
 
@@ -27,7 +29,7 @@ class ByBit:
             return False
 
         self._set_quantity()
-        self._logger.info(f"bybit_request_place_order: {self}")
+        self._logger.info(f"start place_order: {self}")
         reply = self._session.place_order(
                 orderType="Limit",
                 category="linear",
@@ -39,12 +41,11 @@ class ByBit:
                 takeProfit=f'{self._order.take_profit}',
                 stopLoss=f'{self._order.stop_loss}'
             )
-        self._logger.info(f"bybit_request_place_order {reply}")
+        self._logger.debug(f"bybit_request_place_order {reply}")
 
-        reply_order = self._get_result_from_api(reply)
-        if reply_order is None:
-            raise self._exception("place_order result.list empty")
-        self._orderId = reply_order.orderId
+        self._valid_result_api(reply)
+        self._orderId = reply["result"]["orderId"]
+        self._logger.info(f"end place_order: {self}")
 
         return True
 
@@ -75,9 +76,12 @@ class ByBit:
             accountType="UNIFIED",
             coin="USDT",
         )
-        self._logger.info(f"get_quantity_bybit_request_get_wallet_balance {reply}")
+        self._logger.debug(f"get_quantity_bybit_request_get_wallet_balance {reply}")
+        self._valid_result_api(reply)
+        balance = reply['result']['list'][0]['coin'][0]['walletBalance']
+        self._logger.info(f"get_quantity balance: {balance}")
 
-        result = 10 * self._config.account_percent_for_quantity / 100
+        result = math.floor(float(balance) * self._config.account_percent_for_quantity / 100)
 
         self._logger.info(f"get_quantity: {result}")
         self._quantity = result
@@ -88,7 +92,7 @@ class ByBit:
                     limit=1,
                     **kwargs
                 )
-        self._logger.info(f"bybit_request_get_open_orders: {reply}")
+        self._logger.debug(f"bybit_request_get_open_orders: {reply}")
 
         reply_order = self._get_result_from_api(reply)
         if reply_order is None:
@@ -99,8 +103,7 @@ class ByBit:
         return result
 
     def _get_result_from_api(self, reply):
-        if reply["retCode"] != 0:
-            raise self._exception("get_result_from_api retCode not 0")
+        self._valid_result_api(reply)
         reply_list = reply["result"]["list"]
         if len(reply_list) == 0:
             return None
@@ -109,3 +112,7 @@ class ByBit:
 
     def _exception(self, message):
         return CryptoException(self.__class__.__name__, message)
+
+    def _valid_result_api(self, reply):
+        if reply["retCode"] != 0:
+            raise self._exception("_valid_result_api retCode not 0")
