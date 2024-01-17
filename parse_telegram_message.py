@@ -12,14 +12,14 @@ def parse_message(text):
     file_config = 'config.json'
     config = Config(file_config)
     config.read_config_file()
-    logger = CryptoLogger("parse_message", config.log_file)
+    logger = CryptoLogger(config, "parse_message")
 
     try:
         new_signal = Signal(config, text)
-        logger.info(f"Create {new_signal}")
+        logger.debug(f"Create {new_signal}")
 
         new_order = Order(config, new_signal)
-        logger.info(f"Create {new_order}")
+        logger.debug(f"Create {new_order}")
 
         session = HTTP(
             testnet=config.bybit_testnet,
@@ -33,5 +33,6 @@ def parse_message(text):
             time.sleep(config.pause_in_check_order_filled)
             if new_bybit.check_order_filled():
                 break
+        logger.info(f"check end {new_bybit}")
     except Exception as e:
         logger.error(f"error: {e}")
