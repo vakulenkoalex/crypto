@@ -4,9 +4,9 @@ from exception import CryptoException
 from logger import CryptoLogger
 
 
-def valid_result_api(self, reply):
+def valid_result_api(reply):
     if reply["retCode"] != 0:
-        raise self._exception("_valid_result_api retCode not 0")
+        raise CryptoException("by_bit", "_valid_result_api retCode not 0")
 
 
 class ByBitOrder:
