@@ -77,7 +77,7 @@ class ByBitOrder:
             return result
 
     def _set_quantity(self):
-        sum_balance = self._balance * self._config.account_percent_for_quantity / 100
+        sum_balance = self._balance * self._config.leverage * self._config.account_percent_for_quantity / 100
         result = math.floor(sum_balance / self._order.price)
 
         self._logger.info(f"get_quantity: {result}")
