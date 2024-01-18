@@ -30,7 +30,10 @@ async def get_text_form_message(update: Update, context: ContextTypes.DEFAULT_TY
     delta = (datetime.datetime.now(pytz.utc) - message.date).total_seconds()
     logger.debug(f"time delta {delta}")
     if delta > config.telegram_skip_message_seconds:
-        logger.info(f"Skip message id={message.id}")
+        logger.info(f"Skip message by date id={message.id}")
+        return
+    if message.text.find(config.telegram_magic_string) == 0:
+        logger.info(f"Skip message by string id={message.id}")
         return
 
     parse_telegram_message.parse_message(config, balance, message.text)
