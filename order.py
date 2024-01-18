@@ -11,7 +11,6 @@ class Order:
         self.take_profit = 0
         self.stop_loss = 0
         self.symbol = signal.symbol
-        #self.coin_for_sell = signal.coin_for_sell
 
         self._signal = signal
         self._config = config
