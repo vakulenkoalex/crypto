@@ -17,7 +17,7 @@ logger = CryptoLogger(config, "telegram_message")
 async def get_text_form_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
     message = update.effective_message
     logger.info(f"Get message '{message.text}' (id={message.id}, date={message.date})")
-    delta = (datetime.datetime.now(pytz.utc) - message.date).seconds
+    delta = (datetime.datetime.now(pytz.utc) - message.date).total_seconds()
     logger.debug(f"time delta {delta}")
     if delta > config.telegram_skip_message_seconds:
         logger.info(f"Skip message id={message.id}")
