@@ -1,17 +1,27 @@
 import datetime
 
 import pytz
+from pybit.unified_trading import HTTP
 from telegram import Update
 from telegram.ext import filters, MessageHandler, ApplicationBuilder, ContextTypes
 
 import parse_telegram_message
 from config import Config
 from logger import CryptoLogger
+from by_bit import ByBitBalance
 
 file_config = 'config.json'
 config = Config(file_config)
 config.read_config_file()
 logger = CryptoLogger(config, "telegram_message")
+
+session = HTTP(
+            testnet=config.bybit_testnet,
+            api_key=config.bybit_api_key,
+            api_secret=config.bybit_api_secret,
+        )
+new_balance = ByBitBalance(config, session)
+balance = new_balance.get_balance()
 
 
 async def get_text_form_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -22,7 +32,8 @@ async def get_text_form_message(update: Update, context: ContextTypes.DEFAULT_TY
     if delta > config.telegram_skip_message_seconds:
         logger.info(f"Skip message id={message.id}")
         return
-    parse_telegram_message.parse_message(message.text)
+
+    parse_telegram_message.parse_message(config, balance, message.text)
 
 
 logger.info("Start listen")
