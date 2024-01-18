@@ -15,6 +15,7 @@ class Order:
         self._signal = signal
         self._config = config
         self._percent = 0
+        self._round_count = 10000000
         self.get_side_by_direction()
         self.set_tp_sl()
 
@@ -29,16 +30,23 @@ class Order:
     def get_side_by_direction(self):
         if self._signal.direction == Direction.DUMP:
             self.side = 'Buy'
-            self.price = self._signal.low_sum
+            self.price = self._round(self._signal.low_sum * (100 + self._config.price_percent) / 100, True)
             self._percent = self._config.buy_percent_for_tp_sl
         elif self._signal.direction == Direction.PUMP:
             self.side = 'Sell'
-            self.price = self._signal.high_sum
+            self.price = self._round(self._signal.high_sum * (100 - self._config.price_percent) / 100, False)
             self._percent = self._config.sell_percent_for_tp_sl
         else:
             raise CryptoException(self.__class__.__name__, "Direction empty")
 
     def set_tp_sl(self):
-        round_count = 10000000
-        self.take_profit = math.floor(self.price * (100 + self._percent) / 100 * round_count) / round_count
-        self.stop_loss = math.ceil(self.price * (100 - self._percent) / 100 * round_count) / round_count
+        self.take_profit = self._round(self.price * (100 + self._percent) / 100, False)
+        self.stop_loss = self._round(self.price * (100 - self._percent) / 100, True)
+
+    def _round(self, value, up):
+        if up:
+            result = math.ceil(value * self._round_count) / self._round_count
+        else:
+            result = math.floor(value * self._round_count) / self._round_count
+
+        return result
