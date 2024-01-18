@@ -39,6 +39,6 @@ class Order:
             raise CryptoException(self.__class__.__name__, "Direction empty")
 
     def set_tp_sl(self):
-        round_count = 10000
+        round_count = 10000000
         self.take_profit = math.floor(self.price * (100 + self._percent) / 100 * round_count) / round_count
         self.stop_loss = math.ceil(self.price * (100 - self._percent) / 100 * round_count) / round_count
