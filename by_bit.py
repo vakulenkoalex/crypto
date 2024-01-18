@@ -4,14 +4,20 @@ from exception import CryptoException
 from logger import CryptoLogger
 
 
-class ByBit:
-    def __init__(self, config, session, order):
+def valid_result_api(self, reply):
+    if reply["retCode"] != 0:
+        raise self._exception("_valid_result_api retCode not 0")
+
+
+class ByBitOrder:
+    def __init__(self, config, session, order, balance):
         self._config = config
         self._session = session
         self._order = order
-        self._logger = CryptoLogger(config, "ByBit")
+        self._logger = CryptoLogger(config, self.__class__.__name__)
         self._orderId = None
         self._quantity = None
+        self._balance = balance
 
     def __format__(self, format_spec):
         return (f"{self.__class__.__name__}:"
@@ -41,9 +47,9 @@ class ByBit:
                 takeProfit=f'{self._order.take_profit}',
                 stopLoss=f'{self._order.stop_loss}'
             )
-        self._logger.debug(f"bybit_request_place_order {reply}")
+        self._logger.debug(f"bybit_place_order {reply}")
 
-        self._valid_result_api(reply)
+        valid_result_api(reply)
         self._orderId = reply["result"]["orderId"]
         self._logger.info(f"end place_order: {self}")
 
@@ -71,17 +77,8 @@ class ByBit:
             return result
 
     def _set_quantity(self):
-        # TODO нужен алгоритм расчета баланса
-        reply = self._session.get_wallet_balance(
-            accountType="UNIFIED",
-            coin="USDT",
-        )
-        self._logger.debug(f"get_quantity_bybit_request_get_wallet_balance {reply}")
-        self._valid_result_api(reply)
-        balance = reply['result']['list'][0]['coin'][0]['walletBalance']
-        self._logger.info(f"get_quantity balance: {balance}")
-
-        result = math.floor(float(balance) * self._config.account_percent_for_quantity / 100)
+        sum_balance = self._balance * self._config.account_percent_for_quantity / 100
+        result = math.floor(sum_balance / self._order.price)
 
         self._logger.info(f"get_quantity: {result}")
         self._quantity = result
@@ -92,7 +89,7 @@ class ByBit:
                     limit=1,
                     **kwargs
                 )
-        self._logger.debug(f"bybit_request_get_open_orders: {reply}")
+        self._logger.debug(f"bybit_get_open_orders: {reply}")
 
         reply_order = self._get_result_from_api(reply)
         if reply_order is None:
@@ -103,7 +100,7 @@ class ByBit:
         return result
 
     def _get_result_from_api(self, reply):
-        self._valid_result_api(reply)
+        valid_result_api(reply)
         reply_list = reply["result"]["list"]
         if len(reply_list) == 0:
             return None
@@ -113,6 +110,21 @@ class ByBit:
     def _exception(self, message):
         return CryptoException(self.__class__.__name__, message)
 
-    def _valid_result_api(self, reply):
-        if reply["retCode"] != 0:
-            raise self._exception("_valid_result_api retCode not 0")
+
+class ByBitBalance:
+    def __init__(self, config, session):
+        self._config = config
+        self._session = session
+        self._logger = CryptoLogger(config, self.__class__.__name__)
+
+    def get_balance(self):
+        reply = self._session.get_wallet_balance(
+            accountType="UNIFIED",
+            coin="USDT",
+        )
+        self._logger.debug(f"get_balance_bybit_get_wallet_balance {reply}")
+        valid_result_api(reply)
+        balance = float(reply['result']['list'][0]['coin'][0]['walletBalance'])
+        self._logger.info(f"get_balance {balance}")
+
+        return balance
