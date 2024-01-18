@@ -15,7 +15,7 @@ def parse_message(text):
     logger = CryptoLogger(config, "parse_message")
 
     try:
-        new_signal = Signal(config, text)
+        new_signal = Signal(text)
         logger.debug(f"Create {new_signal}")
 
         if new_signal.symbol in config.black_list_symbol:

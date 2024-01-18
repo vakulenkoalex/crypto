@@ -10,7 +10,7 @@ class Direction(Enum):
 
 
 class Signal:
-    def __init__(self, config, text):
+    def __init__(self, text):
         self.text = text
         self.direction = Direction.EMPTY
         self.symbol = ''
