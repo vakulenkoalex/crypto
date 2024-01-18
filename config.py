@@ -12,8 +12,6 @@ class Config:
         self.bybit_testnet = True
         self.telegram_bot_token = ""
         self.log_file = ""
-        self.pause_in_check_order_filled = 5
-        self.counter_in_check_order_filled = 3
         self.debug = False
         self.black_list_symbol = []
         self.telegram_skip_message_seconds = 60
