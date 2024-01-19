@@ -32,7 +32,7 @@ async def get_text_form_message(update: Update, context: ContextTypes.DEFAULT_TY
     if delta > config.telegram_skip_message_seconds:
         logger.info(f"Skip message by date id={message.id}")
         return
-    if message.text.find(config.telegram_magic_string) == 0:
+    if config.telegram_magic_string != "" and message.text.find(config.telegram_magic_string) == -1:
         logger.info(f"Skip message by string id={message.id}")
         return
 
