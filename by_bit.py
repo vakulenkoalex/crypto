@@ -30,9 +30,9 @@ class ByBitOrder:
                 f"orderId={self._orderId}")
 
     def place_order(self):
-        if self._find_open_order():
-            self._logger.info(f"find open order {self}")
-            return False
+        # if self._find_open_order():
+        #     self._logger.info(f"find open order {self}")
+        #     return False
 
         self._set_quantity()
         self._logger.info(f"start place_order: {self}")
