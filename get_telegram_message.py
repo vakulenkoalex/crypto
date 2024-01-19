@@ -26,7 +26,9 @@ balance = new_balance.get_balance()
 
 async def get_text_form_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
     message = update.effective_message
-    logger.info(f"Get message '{message.text}' (id={message.id}, date={message.date})")
+    logger.info(f"Get message '{message.text}' "
+                f"(id={message.id}, date={message.date}, "
+                f"message_thread_id={message.message_thread_id}, chat_id={message.chat_id})")
     delta = (datetime.datetime.now(pytz.utc) - message.date).total_seconds()
     logger.debug(f"time delta {delta}")
     if delta > config.telegram_skip_message_seconds:
